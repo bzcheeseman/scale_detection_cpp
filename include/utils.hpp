@@ -1,9 +1,9 @@
 //
 // Created by Aman LaChapelle on 4/27/17.
 //
-// Iris
+// scale_detector_cpp
 // Copyright (c) 2017 Aman LaChapelle
-// Full license at Iris/LICENSE.txt
+// Full license at scale_detector_cpp/LICENSE.txt
 //
 
 /*

@@ -1,9 +1,9 @@
 //
 // Created by Aman LaChapelle on 4/27/17.
 //
-// Iris
+// scale_detector_cpp
 // Copyright (c) 2017 Aman LaChapelle
-// Full license at Iris/LICENSE.txt
+// Full license at scale_detector_cpp/LICENSE.txt
 //
 
 /*
@@ -29,6 +29,7 @@
 #include <dlib/data_io.h>
 #include <dlib/opencv.h>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <dlib/gui_widgets.h>
 #include <dlib/image_processing.h>
 

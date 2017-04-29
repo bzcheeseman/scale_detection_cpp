@@ -1,9 +1,9 @@
 //
 // Created by Aman LaChapelle on 4/27/17.
 //
-// Iris
+// scale_detector_cpp
 // Copyright (c) 2017 Aman LaChapelle
-// Full license at Iris/LICENSE.txt
+// Full license at scale_detector_cpp/LICENSE.txt
 //
 
 /*
@@ -98,9 +98,7 @@ void ObjectDetector::inference(std::vector<matrix<rgb_pixel>> &data,
 
   int n = data.size();
 
-//  cv::Mat first_frame (toMat(data[0]));
-//  std::cout << first_frame.size() << std::endl;
-//  cv::Size frame_size = cv::Size(first_frame.size());  // get this figured out
+  cv::Mat resized (toMat(data[0]).size(), toMat(data[0]).type());
 
   cv::VideoWriter vid_out (out_vid_name, -1, fps, toMat(data[0]).size(), is_color);
   if (!vid_out.isOpened()){
@@ -114,9 +112,10 @@ void ObjectDetector::inference(std::vector<matrix<rgb_pixel>> &data,
 
   cv::Mat output_overlay, output_img, output_frame;
   for (int i = 0; i < n; i++){
-    auto img = data[i];
+    matrix<rgb_pixel> img = data[i];
     pyramid_up(img);
     auto output = net(img);
+//    img = data[i]; // we want img to point to the original data point
 
     for (auto &&d : output) {
       std::cout << d << std::endl;
@@ -124,8 +123,7 @@ void ObjectDetector::inference(std::vector<matrix<rgb_pixel>> &data,
     }
 
     output_frame = toMat(img);
-    std::cout << img.nr() << " " << img.nc() << std::endl;
-    std::cout << output_frame.size() << std::endl;
-    vid_out.write(output_frame);
+    cv::resize(output_frame, resized, resized.size());
+    vid_out.write(resized);
   }
 }
