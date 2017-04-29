@@ -1,3 +1,5 @@
+# Scale Detection
+
 I could have used any number of approaches using the Dlib framework. Dlib offers detectors like correlation trackers, 
 which are given the bounding box at the beginning and then attempt to track the object through a video, as well as full 
 object detectors that are based on FHOG detectors. However, as I'm interviewing for a Deep Learning position, I chose 

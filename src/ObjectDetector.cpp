@@ -124,6 +124,7 @@ void ObjectDetector::inference(std::vector<matrix<rgb_pixel>> &data,
     }
 
     output_frame = toMat(img);
+    std::cout << img.NC << " " << img.NR << std::endl;
     std::cout << output_frame.size() << std::endl;
     vid_out.write(output_frame);
   }
