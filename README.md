@@ -38,3 +38,13 @@ approaches (as shown by the VOT challenges and other deep learning image detecti
 If you want to test the code, you'll need to create a folder called `data` under the top directory, then inside that a
 folder called `test`. Inside this folder place the video1, video2, video3 .mp4 files. Then create the directories
 `imgs_vid_1`, `imgs_vid_2`, `imgs_vid_3`, and `imgs_vid_3_test`. Then the code should run.
+
+## Dependencies
+```
+dlib
+opencv 2.4.x (I used 2.4.13)
+```
+
+You may not need to link the `cblas` or `lapack` libraries to the executable if you don't have them on your system - 
+`dlib` compiles to support any optimized blas routines you have on your system. Likewise, if your CUDA is working you'll
+have to link `cudnn`, `cublas`, and `curand` (I think).

@@ -98,11 +98,11 @@ void ObjectDetector::inference(std::vector<matrix<rgb_pixel>> &data,
 
   int n = data.size();
 
-  cv::Mat first_frame (toMat(data[0]));
-  std::cout << first_frame.size() << std::endl;
-  cv::Size frame_size = cv::Size(first_frame.size());  // get this figured out
+//  cv::Mat first_frame (toMat(data[0]));
+//  std::cout << first_frame.size() << std::endl;
+//  cv::Size frame_size = cv::Size(first_frame.size());  // get this figured out
 
-  cv::VideoWriter vid_out (out_vid_name, -1, fps, frame_size, is_color);
+  cv::VideoWriter vid_out (out_vid_name, -1, fps, toMat(data[0]).size(), is_color);
   if (!vid_out.isOpened()){
     std::cerr << "Couldn't open video writer" << std::endl;
     return;
