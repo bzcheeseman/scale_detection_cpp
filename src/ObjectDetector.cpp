@@ -100,11 +100,11 @@ void ObjectDetector::inference(std::vector<matrix<rgb_pixel>> &data,
 
   cv::Mat resized (toMat(data[0]).size(), toMat(data[0]).type());
 
-  cv::VideoWriter vid_out (out_vid_name, -1, fps, toMat(data[0]).size(), is_color);
-  if (!vid_out.isOpened()){
-    std::cerr << "Couldn't open video writer" << std::endl;
-    return;
-  }
+//  cv::VideoWriter vid_out (out_vid_name, -1, fps, toMat(data[0]).size(), is_color);
+//  if (!vid_out.isOpened()){
+//    std::cerr << "Couldn't open video writer" << std::endl;
+//    return;
+//  }
 
   if (static_cast<bool>(std::ifstream(out_vid_name))){
     std::remove(out_vid_name.c_str());
@@ -115,15 +115,15 @@ void ObjectDetector::inference(std::vector<matrix<rgb_pixel>> &data,
     matrix<rgb_pixel> img = data[i];
     pyramid_up(img);
     auto output = net(img);
-//    img = data[i]; // we want img to point to the original data point
 
     for (auto &&d : output) {
-      std::cout << d << std::endl;
       draw_rectangle(img, d.rect, bgr_pixel(0, 0, 255), 1);
     }
 
     output_frame = toMat(img);
-    cv::resize(output_frame, resized, resized.size());
-    vid_out.write(resized);
+    cv::imwrite(out_vid_name+"_frames/"+"frame_"+std::to_string(i)+".jpg", output_frame);
+//    cv::resize(output_frame, resized, resized.size());
+//    vid_out << resized;
+    std::cout << "\r" << i << "/" << n << std::flush;
   }
 }

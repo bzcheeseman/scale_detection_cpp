@@ -61,7 +61,7 @@ int main() {
 
   std::cout << "Starting Inference" << std::endl;
 
-  detector.inference(test_imgs, "../data/video3_marked.avi", codec, fps, true);
+  detector.inference(test_imgs, "../data/video3", codec, fps, true);
 
   return 0;
 }
