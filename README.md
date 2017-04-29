@@ -34,3 +34,7 @@ The shortcomings of my approach are that it's slower than the other approaches, 
 any hardware acceleration, and training takes much longer than other approaches. On the other hand, given enough time
 and data, the CNN approach is much more accurate and can in fact perform under much worse conditions than the other
 approaches (as shown by the VOT challenges and other deep learning image detection challenges).
+
+If you want to test the code, you'll need to create a folder called `data` under the top directory, then inside that a
+folder called `test`. Inside this folder place the video1, video2, video3 .mp4 files. Then create the directories
+`imgs_vid_1`, `imgs_vid_2`, `imgs_vid_3`, and `imgs_vid_3_test`. Then the code should run.
