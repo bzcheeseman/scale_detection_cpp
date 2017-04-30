@@ -33,6 +33,7 @@
 #include <dlib/gui_widgets.h>
 #include <dlib/image_processing.h>
 #include <dlib/serialize.h>
+#include <dlib/data_io.h>
 
 // Convert bgr pixels to grey pixels, helper function for dlib
 inline dlib::matrix<unsigned char> bgr2grey(const dlib::matrix<dlib::bgr_pixel> &img) {
@@ -51,13 +52,13 @@ inline dlib::matrix<unsigned char> bgr2grey(const dlib::matrix<dlib::bgr_pixel> 
 }
 
 // Convert bgr pixels to rbg pixels, helper function for dlib
-inline dlib::matrix<rgb_pixel> bgr2rgb(const dlib::matrix<dlib::bgr_pixel> &img) {
-  dlib::matrix<rgb_pixel> out (img.nr(), img.nc());
+inline dlib::matrix<dlib::rgb_pixel> bgr2rgb(const dlib::matrix<dlib::bgr_pixel> &img) {
+  dlib::matrix<dlib::rgb_pixel> out (img.nr(), img.nc());
 
   int rows = img.nr(); int cols = img.nc();
   for (int i = 0; i < rows; i++){
     for (int j = 0; j < cols; j++){
-      rgb_pixel temp;
+      dlib::rgb_pixel temp;
       dlib::assign_pixel(temp, img(i, j));
       out(i, j) = temp;
     }
@@ -67,11 +68,11 @@ inline dlib::matrix<rgb_pixel> bgr2rgb(const dlib::matrix<dlib::bgr_pixel> &img)
 }
 
 // Unused - reads the object centers from a file
-inline void read_img_centers(const std::string &filename, std::vector<point> &centers){
+inline void read_img_centers(const std::string &filename, std::vector<dlib::point> &centers){
 
   std::ifstream file (filename);
   std::string buf;
-  long x; long y; point temp;
+  long x; long y; dlib::point temp;
   while (std::getline(file, buf)){
     std::stringstream ss(buf);
     ss >> x >> y;
@@ -82,10 +83,10 @@ inline void read_img_centers(const std::string &filename, std::vector<point> &ce
 }
 
 // Unused - calculates the object centers from the rectangles of their bounding boxes
-inline void calc_img_centers(const std::vector<std::vector<mmod_rect>> &boxes, std::vector<point> &centers){
+inline void calc_img_centers(const std::vector<std::vector<dlib::mmod_rect>> &boxes, std::vector<dlib::point> &centers){
   long n = boxes.size();
   for (int i = 0; i < n; i++){
-    rectangle r = boxes[i][0].rect;
+    dlib::rectangle r = boxes[i][0].rect;
     centers.push_back({(long)(r.left()+r.width()/2), (long)(r.top()+r.height()/2)});
   }
 }
@@ -115,9 +116,9 @@ inline void video_to_imgs(const std::string &filename,
 
 // Unused - Processes data from the VOT challenge with the idea of using it to train the detector.
 inline void process_vot_sequence(const std::string &sequence_name,
-                                 std::vector<matrix<rgb_pixel>> &imgs,
-                                 std::vector<std::vector<mmod_rect>> &labels,
-                                 std::vector<point> &centers){
+                                 std::vector<dlib::matrix<dlib::rgb_pixel>> &imgs,
+                                 std::vector<std::vector<dlib::mmod_rect>> &labels,
+                                 std::vector<dlib::point> &centers){
 
   std::ifstream labels_file ("../data/vot2013/" + sequence_name + "/groundtruth.txt");
   std::string buf;
@@ -126,13 +127,13 @@ inline void process_vot_sequence(const std::string &sequence_name,
   float left, top, width, height;
   char comma1, comma2, comma3;
   int i = 0;
-  std::vector<mmod_rect> label_vect;
+  std::vector<dlib::mmod_rect> label_vect;
   while (std::getline(labels_file, buf)){
     std::stringstream ss (buf);
     ss >> left >> comma1 >> top >> comma2 >> width >> comma3 >> height;
 
     // Add rectangle to mmod vector
-    label_vect.push_back(mmod_rect(rectangle((int)left, (int)top, (int)(left + width), (int)(top + height))));
+    label_vect.push_back(mmod_rect(dlib::rectangle((int)left, (int)top, (int)(left + width), (int)(top + height))));
     labels.push_back(label_vect);
     label_vect.clear();
 
@@ -143,24 +144,25 @@ inline void process_vot_sequence(const std::string &sequence_name,
     std::stringstream imgno;
     imgno << std::setfill('0') << std::setw(8) << i+1;
     img = cv::imread("../data/vot2013/" + sequence_name + "/" + imgno.str() + ".jpg", CV_LOAD_IMAGE_COLOR);
-    cv_image<bgr_pixel> cvimg(img);
-    imgs.push_back(bgr2rgb(mat(cvimg)));
+    dlib::cv_image<dlib::bgr_pixel> cvimg(img);
+    imgs.push_back(bgr2rgb(dlib::mat(cvimg)));
     i++;
   }
 
 }
 
 // Unused - adds the center point as a bright pixel to the images and returns the modified images
-inline void add_center_pt(std::vector<matrix<rgb_pixel>> &image, const std::vector<point> &obj_center) {
+inline void add_center_pt(std::vector<dlib::matrix<dlib::rgb_pixel>> &image,
+                          const std::vector<dlib::point> &obj_center) {
   long n = image.size();
   assert(image.size() == obj_center.size());
 
-  image_window win;
+  dlib::image_window win;
   for (int i = 0; i < n; i++){
-    image[i] = trans(image[i]);
-    rgb_pixel &pixel = image[i](obj_center[i].x(), obj_center[i].y());
-    assign_pixel_intensity(pixel, 255);
-    image[i] = trans(image[i]);
+    image[i] = dlib::trans(image[i]);
+    dlib::rgb_pixel &pixel = image[i](obj_center[i].x(), obj_center[i].y());
+    dlib::assign_pixel_intensity(pixel, 255);
+    image[i] = dlib::trans(image[i]);
   }
 
 }
@@ -168,26 +170,26 @@ inline void add_center_pt(std::vector<matrix<rgb_pixel>> &image, const std::vect
 // Loads data from the training datasets, tried with VOT data but found that causes problems so no longer.
 // Discovered a bug that means that only training data from video3 get loaded.
 inline void load_train_data(const std::vector<std::string> &vot_sequences,
-                            std::vector<dlib::matrix<rgb_pixel>> &imgs,
-                            std::vector<std::vector<mmod_rect>> &labels,
-                            std::vector<point> &centers){
+                            std::vector<dlib::matrix<dlib::rgb_pixel>> &imgs,
+                            std::vector<std::vector<dlib::mmod_rect>> &labels,
+                            std::vector<dlib::point> &centers){
   // Get training data from videos
-  load_image_dataset(imgs, labels, "../data/video2.xml");  // This one doesn't get loaded it looks like :(
+  dlib::load_image_dataset(imgs, labels, "../data/video2.xml");  // This one doesn't get loaded it looks like :(
   calc_img_centers(labels, centers);
-  load_image_dataset(imgs, labels, "../data/video3.xml");
+  dlib::load_image_dataset(imgs, labels, "../data/video3.xml");
   calc_img_centers(labels, centers);
 }
 
 // Loads testing data, takes output of video_to_imgs and reads it into a vector of samples.
 inline void load_test_data(const std::string &folder,
                            const long &num_imgs,
-                           std::vector<dlib::matrix<rgb_pixel>> &test_samples){
+                           std::vector<dlib::matrix<dlib::rgb_pixel>> &test_samples){
 
   for (long i = 0; i < num_imgs; i++){
     cv::Mat img;
     img = cv::imread(folder+"/frame_"+std::to_string(i)+".jpg");
-    cv_image<bgr_pixel> cvimg(img);
-    test_samples.push_back(bgr2rgb(mat(cvimg)));
+    dlib::cv_image<dlib::bgr_pixel> cvimg(img);
+    test_samples.push_back(bgr2rgb(dlib::mat(cvimg)));
   }
 }
 
